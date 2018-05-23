@@ -28,7 +28,7 @@ function LaboratoryChrome(props) {
       <div className="so-chunk">
         <div className="so-siteHeader LaboratoryChrome__header">
           <span className="so-logo">
-            <a href="https://www.stellar.org/" className="so-logo__main">Stellar</a>
+            <a href="http://armnetwork.github.io/arm-docs/" className="so-logo__main">ArmSDK</a>
             <span className="so-logo__separator"> </span>
             <a href="#" className="so-logo__subSite">laboratory</a>
           </span>

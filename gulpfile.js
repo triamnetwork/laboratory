@@ -39,7 +39,7 @@ var webpackOptions = {
     // Ignore native modules (ed25519)
     new webpack.IgnorePlugin(/ed25519/),
     new HtmlWebpackPlugin({
-      title: 'Stellar Laboratory'
+      title: 'ArmSDK Laboratory'
     })
   ],
   node: {
@@ -72,7 +72,8 @@ gulp.task('develop', function(done) {
       gulp.watch(".tmp/**/*").on("change", bs.reload);
       bs.init({
         notify: false,
-        server: "./.tmp"
+        server: "./.tmp",
+        port: process.env.PORT || 3000
       });
       bsInitialized = true;
     }
