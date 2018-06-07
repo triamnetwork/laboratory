@@ -28,7 +28,7 @@ function LaboratoryChrome(props) {
       <div className="so-chunk">
         <div className="so-siteHeader LaboratoryChrome__header">
           <span className="so-logo">
-            <a href="http://armnetwork.github.io/arm-docs/" className="so-logo__main">ArmSDK</a>
+            <a href="http://triamnetwork.github.io/triam-docs/" className="so-logo__main">TriamSDK</a>
             <span className="so-logo__separator"> </span>
             <a href="#" className="so-logo__subSite">laboratory</a>
           </span>

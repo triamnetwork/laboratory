@@ -6,13 +6,12 @@ export default function Introduction() {
     <div className="so-back">
       <div className="so-chunk">
         <div className="Introduction__container">
-          <h2>ArmSDK Laboratory</h2>
-          <p className="Introduction__lead">The ArmSDK Laboratory is a set of tools that enables people to try out and learn about the Arm network. The laboratory can <a href="#txbuilder">build transactions</a>, <a href="#txsigner">sign them</a>, and <a href="#explorer?resource=transactions&endpoint=create">submit them to the network</a>. It can also <a href="#explorer">make requests to any of the Horizon endpoints</a>.</p>
+          <h2>TriamSDK Laboratory</h2>
+          <p className="Introduction__lead">The TriamSDK Laboratory is a set of tools that enables people to try out and learn about the Triam network. The laboratory can <a href="#txbuilder">build transactions</a>, <a href="#txsigner">sign them</a>, and <a href="#explorer?resource=transactions&endpoint=create">submit them to the network</a>. It can also <a href="#explorer">make requests to any of the Horizon endpoints</a>.</p>
 
-          <p>For ArmSDK docs, take a look at the <a href="http://armnetwork.github.io/arm-docs/">ArmSDK developers site</a>.</p>
+          <p>For TriamSDK docs, take a look at the <a href="https://triamnetwork.github.io/triam-docs/">TriamSDK developers site</a>.</p>
         </div>
       </div>
     </div>
   </div>
 }
-
