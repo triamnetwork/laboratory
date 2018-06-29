@@ -3,11 +3,11 @@ import {Network, Networks} from 'stellar-sdk';
 const NETWORK = {
   available: {
     test: {
-      url: 'https://testnet-horizon.arm-system-holdings.com',
+      url: 'https://testnet-horizon.triamnetwork.com',
       networkObj: new Network(Networks.TESTNET),
     },
     public: {
-      url: 'https://horizon.arm-system-holdings.com',
+      url: 'https://horizon.triamnetwork.com',
       networkObj: new Network(Networks.PUBLIC),
     }
   },
