@@ -30,7 +30,7 @@ export function startFriendbotRequest(target) {
       status: 'loading',
     });
 
-    axios.get('https://testnet-api.arm-system-holdings.com/friendbot?addr=' + target)
+    axios.get('https://testnet-api.triamnetwork.com/friendbot?addr=' + target)
       .then(r => {
         dispatchInNewStack(dispatch, {
           type: FINISH_FRIENDBOT_REQUEST,
@@ -44,7 +44,7 @@ export function startFriendbotRequest(target) {
         let code, message;
         if (e.status === 0) {
           code = '';
-          message = 'Unable to reach Frienbot server at https://testnet-api.arm-system-holdings.com/friendbot';
+          message = 'Unable to reach Frienbot server at https://testnet-api.triamnetwork.com/friendbot';
         } else {
           code = JSON.stringify(e.data, null, 2);
           message = `Failed to fund ${target} on the test network`;
