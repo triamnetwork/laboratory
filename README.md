@@ -1,6 +1,6 @@
 # laboratory
 
-The Triam Laboratory is a suite of tools to help one learn about exploring the Triam network. See it in action: [https://laboratory.arm-system-holdings.com/](https://laboratory.arm-system-holdings.com/).
+The Triam Laboratory is a suite of tools to help one learn about exploring the Triam network. See it in action: [https://laboratory.triamnetwork.com/](https://laboratory.triamnetwork.com/).
 
 ## Developing
 ```
