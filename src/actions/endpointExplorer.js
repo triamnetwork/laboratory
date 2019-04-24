@@ -46,6 +46,7 @@ export function submitRequest(request) {
     dispatch({
       type: START_REQUEST,
       id,
+      isStreaming: Boolean(request.streaming)
     });
 
     if (request.streaming) {
@@ -55,6 +56,7 @@ export function submitRequest(request) {
           type: UPDATE_REQUEST,
           id,
           body: message,
+          isStreaming: true
         })
       })
     } else {
@@ -90,7 +92,6 @@ function httpRequest(request) {
 }
 
 function streamingRequest(url, onmessage) {
-  var callBuilder = new CallBuilder();
-  callBuilder.url = URI(url);
+  var callBuilder = new CallBuilder(URI(url));
   return callBuilder.stream({onmessage});
 }

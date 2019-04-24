@@ -9,6 +9,10 @@ import {getEndpoint} from '../data/endpoints';
 import NETWORK from '../constants/network';
 import UriTemplates from 'uri-templates';
 import querystring from 'querystring';
+import {addEventHandler} from '../utilities/metrics'
+import endpointExplorerMetrics from '../metricsHandlers/endpointExplorer'
+
+addEventHandler(endpointExplorerMetrics)
 
 class EndpointExplorer extends React.Component {
   render() {
@@ -38,8 +42,8 @@ class EndpointExplorer extends React.Component {
       <div className="so-chunk">
         <div className="pageIntro">
           <p>
-            This tool can be used to run queries against the <a href="https://www.stellar.org/developers/reference/" target="_blank">REST API endpoints</a> on the
-            Horizon server. Horizon is the client facing library for the Stellar ecosystem.</p>
+            This tool can be used to run queries against the <a href="https://triamnetwork.github.io/triam-docs" target="_blank">REST API endpoints</a> on the
+            Horizon server. Horizon is the client facing library for the Triam ecosystem.</p>
         </div>
         <div className="EndpointExplorer">
           <div className="EndpointExplorer__picker">
@@ -68,7 +72,7 @@ export default connect(chooseState)(EndpointExplorer)
 function chooseState(state) {
   return {
     state: state.endpointExplorer,
-    baseURL: NETWORK.available[state.network.current].url,
+    baseURL: state.network.current.horizonURL,
   };
 }
 

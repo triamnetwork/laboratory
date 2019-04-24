@@ -44,7 +44,7 @@ export function startFriendbotRequest(target) {
         let code, message;
         if (e.status === 0) {
           code = '';
-          message = 'Unable to reach Frienbot server at https://testnet-api.triamnetwork.com/friendbot';
+          message = 'Unable to reach Friendbot server at https://testnet-api.triamnetwork.com/friendbot';
         } else {
           code = JSON.stringify(e.data, null, 2);
           message = `Failed to fund ${target} on the test network`;

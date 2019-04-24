@@ -59,7 +59,7 @@ function parseArm(anchor, object) {
 
 function parseNormal(anchor, object) {
   anchor.nodes = [];
-  _(object).functions().without('toXDR', 'ext').value().forEach(function(name) {
+  _(object).functionsIn().without('toXDR').value().forEach(function(name) {
     anchor.nodes.push({});
     buildTreeFromObject(object[name](), anchor.nodes[anchor.nodes.length-1], name);
   });
@@ -74,12 +74,12 @@ function hasChildren(object) {
   if (object && object._isBuffer) {
     return false;
   }
-  var functions = _(object).functions();
-  if (functions.value().length == 0) {
+  var functions = _.functionsIn(object);
+  if (functions.length == 0) {
     return false;
   }
   // int64
-  if (functions.include('getLowBits') && functions.include('getHighBits')) {
+  if (_.includes(functions, 'getLowBits') && _.includes(functions, 'getHighBits')) {
     return false;
   }
   return true;
@@ -150,8 +150,9 @@ function getValue(object, name) {
     return object.toString();
   }
 
+
   if (object && object._isBuffer) {
-    return {type: 'code', value: new Buffer(object).toString('base64')};
+    return {type: 'code', raw: object, value: new Buffer(object).toString('base64')};
   }
 
   if (typeof object === 'undefined') {

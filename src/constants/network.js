@@ -1,14 +1,17 @@
-import {Network, Networks} from 'stellar-sdk';
+export const Networks = {
+  TESTNET: 'SAAK5654--ARM-NETWORK--BHC3SQOHPO2GGI--BY-B.A.P--CNEMJQCWPTA--RUBY-AND-BLOCKCHAIN--3KECMPY5L7W--THANKYOU-CS--S542ZHDVHLFV',
+  PUBLIC: 'SAAK5654--ARM-NETWORK--BHC3SQOHPO2GGI--BY-B.A.P--CNEMJQCWPTA--RUBY-AND-BLOCKCHAIN--3KECMPY5L7W--THANKYOU-CS--S542ZHDVHLFV'
+};
 
 const NETWORK = {
   available: {
     test: {
-      url: 'https://testnet-horizon.triamnetwork.com',
-      networkObj: new Network(Networks.TESTNET),
+      horizonURL: 'https://testnet-horizon.triamnetwork.com',
+      networkPassphrase: Networks.TESTNET
     },
     public: {
-      url: 'https://horizon.triamnetwork.com',
-      networkObj: new Network(Networks.PUBLIC),
+      horizonURL: 'https://horizon.triamnetwork.com',
+      networkPassphrase: Networks.PUBLIC
     }
   },
   defaultName: 'test',

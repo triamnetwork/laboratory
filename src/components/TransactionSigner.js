@@ -20,15 +20,20 @@ import clickToSelect from '../utilities/clickToSelect';
 import scrollOnAnchorOpen from '../utilities/scrollOnAnchorOpen';
 import extrapolateFromXdr from '../utilities/extrapolateFromXdr';
 import validateTxXdr from '../utilities/validateTxXdr';
-import TreeView from './TreeView';
 import NETWORK from '../constants/network';
 import {signTransaction} from '../utilities/Libify';
+import {addEventHandler} from '../utilities/metrics'
+import transactionSignerMetrics from '../metricsHandlers/transactionSigner'
+
+addEventHandler(transactionSignerMetrics)
 
 class TransactionSigner extends React.Component {
   render() {
-    let {dispatch, networkObj} = this.props;
+    let {dispatch, networkPassphrase, horizonURL } = this.props;
     let {xdr, signers, bipPath, ledgerwalletStatus} = this.props.state;
     let content;
+
+    let networkObj = new Network(networkPassphrase)
 
     if (validateTxXdr(xdr).result !== 'success') {
       content = <div className="so-back">
@@ -45,6 +50,7 @@ class TransactionSigner extends React.Component {
       let transaction = new Transaction(xdr);
 
       let infoTable = {
+        'Signing for': <pre className="so-code so-code__wrap"><code>{horizonURL}</code></pre>,
         'Transaction Envelope XDR': <EasySelect plain={true}><pre className="so-code so-code__wrap"><code>{xdr}</code></pre></EasySelect>,
         'Transaction Hash': <EasySelect plain={true}><pre className="so-code so-code__wrap"><code>{transaction.hash().toString('hex')}</code></pre></EasySelect>,
         'Source account': transaction.source,
@@ -74,19 +80,9 @@ class TransactionSigner extends React.Component {
         </p>
       }
 
-      let txDetails;
-      if (result.xdr) { // Only show tree view if xdr is valid and exists
-        txDetails = <div className="so-back TransactionSigner__details">
-          <div className="so-chunk">
-            <p className="TransactionSigner__details__title">Transaction result details</p>
-            <TreeView className="TransactionSigner__details__tree" nodes={extrapolateFromXdr(result.xdr, 'TransactionEnvelope')} />
-          </div>
-        </div>
-      }
-
       let ledgerwalletMessage;
       if (ledgerwalletStatus.message) {
-  
+
         let messageAlertType;
         if (ledgerwalletStatus.status === 'loading') {
           messageAlertType = 's-alert--info';
@@ -159,7 +155,6 @@ class TransactionSigner extends React.Component {
             {submitLink} {xdrLink}
           </div>
         </div>
-        {txDetails}
       </div>
     }
     return <div className="TransactionSigner">
@@ -167,12 +162,11 @@ class TransactionSigner extends React.Component {
         <div className="so-chunk">
           <div className="pageIntro">
             <p>
-              The transaction signer lets you add signatures to a Stellar transaction. Signatures are used in the network to prove that the account is authorized to perform the operations in the transaction.
+              The transaction signer lets you add signatures to a Triam transaction. Signatures are used in the network to prove that the account is authorized to perform the operations in the transaction.
             </p>
             <p>
               For simple transactions, you only need one signature from the correct account. Some advanced signatures may require more than one signature if there are multiple source accounts or signing keys.
             </p>
-            <p><a href="https://www.stellar.org/developers/learn/concepts/multi-sig.html" target="_blank">Read more about signatures on the developer's site.</a></p>
           </div>
         </div>
       </div>
@@ -186,7 +180,8 @@ export default connect(chooseState)(TransactionSigner);
 function chooseState(state) {
   return {
     state: state.transactionSigner,
-    networkObj: NETWORK.available[state.network.current].networkObj,
+    networkPassphrase: state.network.current.networkPassphrase,
+    horizonURL: state.network.current.horizonURL,
   }
 }
 

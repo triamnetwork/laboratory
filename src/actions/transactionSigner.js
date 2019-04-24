@@ -46,6 +46,7 @@ export function signWithLedger(txXDR, bipPath) {
     let transaction = new Transaction(txXDR);
 
     let onError = err => {
+      console.log("onError", err);
       if (err.message) {
         err = err.message;
       } else if (err.errorCode == 2) {
@@ -61,24 +62,27 @@ export function signWithLedger(txXDR, bipPath) {
     };
 
     let onConnect = (ledgerApi) => {
-      BP.all([
-        ledgerApi.getPublicKey(bipPath),
-        ledgerApi.signTransaction(bipPath, transaction.signatureBase()),
-      ]).then(results => {
-        let {publicKey} = results[0];
-        let {signature} = results[1];
-        let keyPair = Keypair.fromPublicKey(publicKey);
-        let hint = keyPair.signatureHint();
-        let decorated = new xdr.DecoratedSignature({hint, signature});
+      let publicKey;
+      ledgerApi.getPublicKey(bipPath).then(result => {
+        publicKey = result.publicKey,
+        console.log("publicKey", publicKey);
+      })
+        .then(() => ledgerApi.signTransaction(bipPath, transaction.signatureBase()))
+        .then(result => {
+          let {signature} = result;
+          let keyPair = Keypair.fromPublicKey(publicKey);
+          let hint = keyPair.signatureHint();
+          let decorated = new xdr.DecoratedSignature({hint, signature});
 
-        dispatch({
-          type: LEDGER_WALLET_SIGN_SUCCESS,
-          signature: decorated,
-        });
-      }).catch(onError);
+          dispatch({
+              type: LEDGER_WALLET_SIGN_SUCCESS,
+              signature: decorated,
+            });
+        })
+        .catch(onError);
     };
 
-    const openTimeout = 60 * 1000;
+    const openTimeout = 120 * 1000;
     LedgerTransport.create(openTimeout).then((transport) => {
       transport.setDebugMode(true);
       onConnect(new LedgerStr(transport));
