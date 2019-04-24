@@ -1,5 +1,6 @@
 'use strict';
 
+require('dotenv').config()
 var _           = require('lodash');
 var bs          = require('browser-sync').create();
 var gulp        = require('gulp');
@@ -54,6 +55,12 @@ gulp.task('develop', function(done) {
       path: './.tmp'
     },
     plugins: [
+      new webpack.DefinePlugin({
+        "process.env": {
+          AMPLITUDE_KEY: JSON.stringify(process.env.AMPLITUDE_KEY),
+          NODE_ENV: JSON.stringify('development')
+        }
+      }),
       new webpack.optimize.CommonsChunkPlugin("vendor", "vendor.js"),
       new ExtractTextPlugin('style.css', {allChunks: true})
     ]
@@ -72,8 +79,7 @@ gulp.task('develop', function(done) {
       gulp.watch(".tmp/**/*").on("change", bs.reload);
       bs.init({
         notify: false,
-        server: "./.tmp",
-        port: process.env.PORT || 3000
+        server: "./.tmp"
       });
       bsInitialized = true;
     }
@@ -95,6 +101,12 @@ gulp.task('build', function(done) {
       path: './dist'
     },
     plugins: [
+      new webpack.DefinePlugin({
+        "process.env": {
+          AMPLITUDE_KEY: JSON.stringify(process.env.AMPLITUDE_KEY),
+          NODE_ENV: JSON.stringify('production')
+        }
+      }),
       new webpack.optimize.CommonsChunkPlugin("vendor", "vendor-[chunkhash].js"),
       new ExtractTextPlugin('style-[contenthash].css', {allChunks: true}),
       new webpack.optimize.DedupePlugin(),
@@ -110,7 +122,7 @@ gulp.task('build', function(done) {
 
 
 function merge(object1, object2) {
-  return _.merge(object1, object2, function(a, b) {
+  return _.mergeWith(object1, object2, function(a, b) {
     if (_.isArray(a)) {
       return a.concat(b);
     }

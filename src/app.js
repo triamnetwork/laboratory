@@ -9,6 +9,7 @@ import {throttle} from 'lodash';
 
 import rootReducer from './reducers/root';
 import logging from './middleware/logging';
+import metrics from './middleware/metrics';
 import {routerMiddleware} from './utilities/simpleRouter';
 import LaboratoryChrome from './components/LaboratoryChrome';
 import {loadState, saveState}  from './localStorage';
@@ -25,6 +26,7 @@ document.write('<div id="app"></div>');
 
 
 let createStoreWithMiddleware = applyMiddleware(
+  metrics,
   thunk,
   routerMiddleware,
   logging
@@ -38,9 +40,4 @@ store.subscribe(throttle(() => {
   });
 }, 1000));
 
-ReactDOM.render(
-  <Provider store={store}>
-    <LaboratoryChrome />
-  </Provider>,
-  document.getElementById('app')
-);
+ReactDOM.render(<Provider store={store}><LaboratoryChrome /></Provider>,document.getElementById('app'));

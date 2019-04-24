@@ -36,7 +36,7 @@ export default function TxBuilderAttributes(props) {
           value={attributes['fee']}
           onUpdate={(value) => {onUpdate('fee', value)}}
           />
-        <p className="optionsTable__pair__content__note">The <a href="https://www.stellar.org/developers/learn/concepts/fees.html">network base fee</a> is currently set to 100 stroops (0.00001 ria). Transaction fee is equal to base fee times number of operations in this transaction.</p>
+        <p className="optionsTable__pair__content__note">The <a href="https://triamnetwork.com/faq#role-x2">network base fee</a> is currently set to 10000 stroops (0.001 RIA). Transaction fee is equal to base fee times number of operations in this transaction.</p>
       </OptionsTablePair>
       <OptionsTablePair optional={true} label={<span>Memo <HelpMark href="https://www.stellar.org/developers/learn/concepts/transactions.html#memo" /></span>}>
         <MemoPicker
@@ -56,6 +56,14 @@ export default function TxBuilderAttributes(props) {
           onUpdate={(value) => {onUpdate('timebounds', value)}}
           />
         <p className="optionsTable__pair__content__note">Enter <a href="http://www.epochconverter.com/" target="_blank">unix timestamp</a> values of time bounds when this transaction will be valid.</p>
+        <p className="optionsTable__pair__content__note">For regular transactions, it is highly recommended to set <code>max_time</code> to get <a href="https://github.com/stellar/stellar-core/issues/1811" target="_blank">a final result</a> of a transaction in a defined time.</p>
+        <p className="optionsTable__pair__content__note">
+          <a
+            className="s-button"
+            onClick={() => onUpdate('timebounds', {maxTime: Math.ceil(new Date().getTime()/1000) + 5*60})}
+            >Set to 5 minutes from now</a>
+          <br />
+        </p>
       </OptionsTablePair>
     </div>
   </div>
@@ -65,7 +73,7 @@ class sequenceFetcherClass extends React.Component {
   render() {
     let {attributes, sequenceFetcherError} = this.props.state;
     let dispatch = this.props.dispatch;
-    let currentNetwork = this.props.currentNetwork;
+    let horizonURL = this.props.horizonURL;
     if (!StrKey.isValidEd25519PublicKey(attributes.sourceAccount)) {
       return null;
     }
@@ -83,10 +91,11 @@ class sequenceFetcherClass extends React.Component {
       <a
         className="s-button"
         onClick={() => dispatch(
-          fetchSequence(attributes.sourceAccount, NETWORK.available[currentNetwork].url)
+          fetchSequence(attributes.sourceAccount, horizonURL)
         )}
         >Fetch next sequence number for account starting with "{truncatedAccountId}"</a>
       <br />
+      <small>Fetching from: <code>{horizonURL}</code></small><br />
       {sequenceErrorMessage}
     </p>
   }
@@ -96,6 +105,6 @@ let SequenceFetcher = connect(chooseState)(sequenceFetcherClass);
 function chooseState(state) {
   return {
     state: state.transactionBuilder,
-    currentNetwork: state.network.current,
+    horizonURL: state.network.current.horizonURL,
   }
 }

@@ -13,6 +13,10 @@ import OperationsBuilder from './OperationsBuilder';
 import {getOperation} from '../data/operations';
 import TxBuilderResult from './TxBuilderResult';
 import {resetTxbuilder} from '../actions/transactionBuilder';
+import {addEventHandler} from '../utilities/metrics'
+import transactionBuilderMetrics from '../metricsHandlers/transactionBuilder'
+
+addEventHandler(transactionBuilderMetrics)
 
 class TransactionBuilder extends React.Component {
   render() {
@@ -26,7 +30,7 @@ class TransactionBuilder extends React.Component {
       <div className="so-back">
         <div className="so-chunk">
           <div className="pageIntro">
-            <p>The transaction builder lets you build a new Stellar transaction.</p>
+            <p>The transaction builder lets you build a new Triam transaction.</p>
             <p>
               This transaction will start out with no signatures. To make it into the ledger, this transaction will then need to be signed and submitted to the network.
             </p>

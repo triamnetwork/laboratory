@@ -49,10 +49,20 @@ let castIntOrUndefined = function(value) {
   if (typeof value === 'number') {
     return value;
   }
-  if (_.isString(value) && value.match(/^[0-9]*$/g)) {
+  if (_.isString(value) && value.match(/^[0-9]+$/g)) {
     return Number(value);
   }
   return undefined;
+}
+
+// This function processes the value in three situations:
+// 1. Is a string: return as is
+// 2. String is empty: converts to undefined (useful for optional arguments)
+let castStringOrUndefined = function(value) {
+  if (!_.isString(value) || value === '') {
+    return undefined;
+  }
+  return String(value);
 }
 
 let castStringOrNull = function(value) {
@@ -258,7 +268,7 @@ Libify.Operation.setOptions = function(opts) {
     medThreshold: castIntOrUndefined(opts.medThreshold),
     highThreshold: castIntOrUndefined(opts.highThreshold),
     signer: signer,
-    homeDomain: opts.homeDomain,
+    homeDomain: castStringOrUndefined(opts.homeDomain),
     source: opts.sourceAccount,
   })
 }
@@ -269,6 +279,15 @@ Libify.Operation.manageData = function(opts) {
   return Sdk.Operation.manageData({
     name: opts.name,
     value: castStringOrNull(opts.value),
+    source: opts.sourceAccount,
+  })
+}
+
+Libify.Operation.bumpSequence = function(opts) {
+  assertNotEmpty(opts.bumpTo, 'Sequence number should be set');
+  return Sdk.Operation.bumpSequence({
+    bumpTo: opts.bumpTo,
+    source: opts.sourceAccount,
   })
 }
 
@@ -287,6 +306,11 @@ Libify.buildTransaction = function(attributes, operations, networkObj) {
 
     let opts = {};
     if (attributes.fee !== '') {
+      const MAX_UINT32 = Math.pow( 2, 32 ) - 1;
+      if (parseInt(attributes.fee) > MAX_UINT32) {
+        throw Error(`Base Fee: too large (invalid 32-bit unisigned integer)`);
+      }
+      
       opts.fee = attributes.fee;
     }
 
@@ -308,6 +332,11 @@ Libify.buildTransaction = function(attributes, operations, networkObj) {
     }
 
     var transaction = new Sdk.TransactionBuilder(account, opts)
+
+    if (_.isEmpty(timebounds) ||
+      (opts.timebounds && opts.timebounds.maxTime == 0)) {
+      transaction.setTimeout(transaction.setTimeout(Sdk.TimeoutInfinite));
+    }
 
     if (attributes.memoType !== 'MEMO_NONE' && attributes.memoType !== '') {
       try {

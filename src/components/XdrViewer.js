@@ -1,16 +1,25 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import _ from 'lodash';
+import FETCHED_SIGNERS from '../constants/fetched_signers';
 import SelectPicker from './FormComponents/SelectPicker';
 import extrapolateFromXdr from '../utilities/extrapolateFromXdr';
 import TreeView from './TreeView';
 import validateBase64 from '../utilities/validateBase64';
-import {updateXdrInput, updateXdrType, fetchLatestTx} from '../actions/xdrViewer';
-import NETWORK from '../constants/network';
+import {updateXdrInput, updateXdrType, fetchLatestTx, fetchSigners} from '../actions/xdrViewer';
 import {xdr} from 'stellar-sdk';
+import {addEventHandler, logEvent} from '../utilities/metrics'
+import xdrViewerMetrics, {metricsEvents} from '../metricsHandlers/xdrViewer'
+
+// XDR decoding doesn't happen in redux, but is pretty much the only thing on
+// this page that we care about. Log metrics from the component as well.
+addEventHandler(xdrViewerMetrics)
+
+const tLogEvent = _.debounce(logEvent, 1000)
+
 
 function XdrViewer(props) {
-  let {dispatch, state, baseURL} = props;
+  let {dispatch, state, baseURL, networkPassphrase} = props;
 
   let validation = validateBase64(state.input);
   let messageClass = validation.result === 'error' ? 'xdrInput__message__alert' : 'xdrInput__message__success';
@@ -24,28 +33,40 @@ function XdrViewer(props) {
     errorMessage = <p>Please select a XDR type</p>;
   } else {
     try {
-      treeView = <TreeView nodes={extrapolateFromXdr(state.input, state.type)} />
+      treeView = <TreeView nodes={extrapolateFromXdr(state.input, state.type)} fetchedSigners={state.fetchedSigners} />
+      tLogEvent(metricsEvents.decodeSuccess, {type: state.type})
     } catch (e) {
       console.error(e)
+      tLogEvent(metricsEvents.decodeFailed, {type: state.type})
       errorMessage = <p>Unable to decode input as {state.type}</p>;
     }
+  }
+
+  // Fetch signers on initial load
+  if (state.type === "TransactionEnvelope" && state.fetchedSigners.state === FETCHED_SIGNERS.NONE) {
+    dispatch(fetchSigners(state.input, baseURL, networkPassphrase))
   }
 
   return <div>
     <div className="XdrViewer__setup so-back">
       <div className="so-chunk">
         <div className="pageIntro">
-          <p><a href="https://www.stellar.org/developers/horizon/learn/xdr.html">External Data Representation (XDR)</a> is a standardized protocol that the Stellar network uses to encode data.</p>
-          <p>The XDR Viewer is a tool that displays contents of a Stellar XDR blob in a human readable format.</p>
+          <p><a href="https://www.stellar.org/developers/horizon/learn/xdr.html">External Data Representation (XDR)</a> is a standardized protocol that the Triam network uses to encode data.</p>
+          <p>The XDR Viewer is a tool that displays contents of a Triam XDR blob in a human readable format.</p>
         </div>
         <p className="XdrViewer__label">
-          Input a base-64 encoded XDR blob, or <a onClick={() => dispatch(fetchLatestTx(baseURL))}>fetch the latest transaction to try it out</a>:
+        Input a base-64 encoded XDR blob, or <a onClick={() => dispatch(fetchLatestTx(baseURL, networkPassphrase))}>fetch the latest transaction to try it out</a>:
         </p>
         <div className="xdrInput__input">
           <textarea
             value={state.input}
             className="xdrInput__input__textarea"
-            onChange={(event) => dispatch(updateXdrInput(event.target.value))}
+            onChange={(event) => {
+              dispatch(updateXdrInput(event.target.value));
+              if (state.type === "TransactionEnvelope") {
+                dispatch(fetchSigners(event.target.value, baseURL, networkPassphrase))
+              }
+            }}
             placeholder="Example: AAAAAGXNhB2hIkbP//jgzn4os/AAAAZAB+BaLPAAA5Q/xL..."></textarea>
         </div>
         <div className="xdrInput__message">
@@ -74,7 +95,8 @@ export default connect(chooseState)(XdrViewer);
 function chooseState(state) {
   return {
     state: state.xdrViewer,
-    baseURL: NETWORK.available[state.network.current].url,
+    baseURL: state.network.current.horizonURL,
+    networkPassphrase: state.network.current.networkPassphrase
   }
 }
 
